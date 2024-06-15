@@ -217,4 +217,13 @@ mse = mean((vout - gt(2, :)).^2);
 disp('MSE = ')
 disp(mse)
 
+%% Compute spectrum
+
+frequency_axis = 0:fs/length(t):fs - fs/length(t);
+figure;
+plot(frequency_axis, 20*log(abs(fft(vin))));
+hold on;
+plot(frequency_axis, 20*log(abs(fft(vout))));
+
+
 
