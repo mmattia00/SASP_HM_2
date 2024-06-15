@@ -26,7 +26,7 @@ vin = A * sin(2*pi*f0*t);
 
 % Music Signal Test (Uncomment the following lines for test)
 % [vin, fs_rec] = audioread('guitar_input.wav');
-% G = 1;                                  % Gain factor 
+% G = 5;                                  % Gain factor 
 % vin = G * (vin(:, 1) + vin(:, 2))/2;    % Convert the signal to MONO
 % vin = resample(vin, fs, fs_rec);        % Resampling the signal from 44.1 kHz to 96 kHz
 % t = 0:Ts:Ts*(length(vin)-1);
@@ -77,48 +77,6 @@ b6 = 0;
 a5 = 0;
 a9 = 0;
 
-ii = 0;
-while ( ii < 50000)
-    ii = ii + 1;
-    
-    
-    % input
-    a11 = vin(1);
-    
-    % dynamic elements
-    a12 = b12;
-    a6 = b6;
-    
-    % FORWARD
-    b4 = Spar2(1, :)*[0; a5; a6];
-    a1 = b4;
-    
-    b10 = Sser1(1, :)*[0; a11; a12];
-    a8 = b10;
-    
-    b7 = Sser2(1, :)*[0; a8; a9];
-    a2 = b7;
-
-    b3 = Spar1(3, :)*[a1; a2; 0];
-
-    % non-linear component
-    a3 = antiparallel_diodes(b3, Z3);
-
-    % BACKWARD
-    b1 = Spar1(1, :)*[a1; a2; a3];
-    a4 = b1;
-
-    b2 = Spar1(2, :)*[a1; a2; a3];
-    a7 = b2;
-
-    b6 = Spar2(3, :)*[a4; a5; a6];
-    
-    b8 = Sser2(2, :)*[a7; a8; a9];
-
-    a10 = b8;
-
-    b12 = Sser1(3, :)*[a10; a11; a12];
-end
 %% Initialization of Output Signals
 vout = zeros(1, length(t));
 
@@ -162,24 +120,17 @@ for n = 1 : length(t)
     a10 = b8;
 
     b12 = Sser1(3, :)*[a10; a11; a12];
+    % useless to compute the 2 reflected waves of resistences 
     % b11 = Sser1(2, :)*[a10; a11; a12];
     % b9 = Sser2(3, :)*[a7; a8; a9];
     b5 = Spar2(2, :)*[a4; a5; a6];
    
     % Read Output
-    vout(n) = (a5+b5)/2;
-    
+    vout(n) = (a5+b5)/2;   
 end
 
 % Uncomment the following line to hear the Diode Clipper
-sound(vout, fs)
-
-% %% Plot Personalizzati
-% figure(3)
-% subplot(1,2,1);
-% plot(t,vin);
-% subplot(1,2,2);
-% plot(t,vout);
+% sound(vout, fs)
 
 %% Output Plots
 
@@ -217,13 +168,15 @@ mse = mean((vout - gt(2, :)).^2);
 disp('MSE = ')
 disp(mse)
 
-%% Compute spectrum
+%% Compute spectrum to visualize the harmonics introduced by distortion
 
-frequency_axis = 0:fs/length(t):fs - fs/length(t);
+frequency_axis = fs/2*linspace(-1,1,fs+1);
 figure;
 plot(frequency_axis, 20*log(abs(fft(vin))));
 hold on;
 plot(frequency_axis, 20*log(abs(fft(vout))));
+title("Magnitude FFT of input vs output")
+xlabel('Frequency (Hz)');
+ylabel('magnitude');
+legend("input signal", "output signal");
 
-
-%% prova
