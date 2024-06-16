@@ -1,5 +1,7 @@
 clear; close all; clc
 
+%% Written by Mattia Montanari and Flavio Ingenito
+
 %% Simscape File for Ground Truth
 
 load('ssc_output.mat')
@@ -91,7 +93,7 @@ for n = 1 : length(t)
     a12 = b12;
     a6 = b6;
     
-    % FORWARD
+    % FORWARD SCAN
     b4 = Spar2(1, :)*[0; a5; a6];
     a1 = b4;
     
@@ -106,7 +108,7 @@ for n = 1 : length(t)
     % non-linear component
     a3 = antiparallel_diodes(b3, Z3);
 
-    % BACKWARD
+    % BACKWARD SCAN
     b1 = Spar1(1, :)*[a1; a2; a3];
     a4 = b1;
 
@@ -120,7 +122,7 @@ for n = 1 : length(t)
     a10 = b8;
 
     b12 = Sser1(3, :)*[a10; a11; a12];
-    % useless to compute the 2 reflected waves of resistences 
+    % useless to compute the 2 reflected waves of resistances 
     % b11 = Sser1(2, :)*[a10; a11; a12];
     % b9 = Sser2(3, :)*[a7; a8; a9];
     b5 = Spar2(2, :)*[a4; a5; a6];
@@ -172,11 +174,12 @@ disp(mse)
 
 frequency_axis = fs/2*linspace(-1,1,fs+1);
 figure;
+set(gcf, 'Color', 'w');
 plot(frequency_axis, 20*log(abs(fft(vin))));
 hold on;
 plot(frequency_axis, 20*log(abs(fft(vout))));
-title("Magnitude FFT of input vs output")
-xlabel('Frequency (Hz)');
-ylabel('magnitude');
-legend("input signal", "output signal");
+title("Magnitude FFT of input vs output",'Fontsize',18,'interpreter','latex')
+xlabel('Frequency (Hz)','Fontsize',16,'interpreter','latex');
+ylabel('Magnitude (dB)','Fontsize',16,'interpreter','latex');
+legend("input signal", "output signal",'Fontsize',16,'interpreter','latex');
 
